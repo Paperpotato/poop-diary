@@ -1,11 +1,13 @@
 <template>
   <v-app>
     <v-app-bar app color="primary" dark>
-      <div class="d-flex align-center">
-        <h1>Poopr</h1>
-      </div>
-
-      <v-spacer></v-spacer>
+      <v-row justify="center" align="center">
+        <v-col>
+          <div class="align-center">
+            <h1>Poopr. Log your Logs!</h1>
+          </div>
+        </v-col>
+      </v-row>
     </v-app-bar>
 
     <v-main>

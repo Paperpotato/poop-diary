@@ -1,11 +1,11 @@
 <template>
   <v-container>
-    <v-row class="text-center">
+    <!-- <v-row class="text-center">
       <v-col cols="12">
         <h1>Add Poop</h1>
         <v-btn color="green" @click="test">Print stuff</v-btn>
       </v-col>
-    </v-row>
+    </v-row> -->
     <v-row>
       <v-col>
         <v-btn color="brown" @click="showTimePicker = !showTimePicker"
@@ -51,13 +51,10 @@
     </v-row>
     <v-row>
       <v-col>
-        <v-card>
-          <v-card-text>
-            <v-text-field label="notes" outlined></v-text-field>
-          </v-card-text>
-        </v-card>
+        <v-text-field label="notes" outlined></v-text-field>
       </v-col>
     </v-row>
+    <h5>What did you eat?!</h5>
     <v-row>
       <v-col v-for="food in foods" :key="food.label">
         <v-checkbox
@@ -69,6 +66,7 @@
         ></v-checkbox>
       </v-col>
     </v-row>
+    <h5>Do you feel like shit?</h5>
     <v-row>
       <v-col v-for="symptom in symptoms" :key="symptom.label">
         <v-checkbox
@@ -80,6 +78,7 @@
         ></v-checkbox>
       </v-col>
     </v-row>
+    <h5>How're you actually feeling?</h5>
     <v-row>
       <v-col v-for="mood in moods" :key="mood.label">
         <v-checkbox
