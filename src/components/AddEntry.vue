@@ -221,16 +221,21 @@ export default Vue.extend({
         label: "Sad",
         value: false
       }
-    ]
+    ],
+    username: ""
   }),
   computed: {
-    username() {
-      return localStorage.getItem("poopAccount");
-    }
+    // username() {
+    //   return localStorage.getItem("poopAccount");
+    // }
+  },
+  created() {
+    const username = localStorage.getItem("poopAccount");
+    this.username = username ? username : "";
   },
   methods: {
     test() {
-      console.log("meow");
+      console.log(localStorage.getItem("poopAccount"));
     },
     addPoop() {
       const timestamp = moment
