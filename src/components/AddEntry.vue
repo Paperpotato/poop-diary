@@ -8,6 +8,11 @@
     </v-row> -->
     <v-row>
       <v-col>
+        <v-btn color="green" @click="addPoop">Add Poop!</v-btn>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col>
         <v-btn color="brown" @click="showTimePicker = !showTimePicker"
           >Edit Time</v-btn
         >
@@ -92,16 +97,18 @@
     </v-row>
     <v-row>
       <v-col>
-        <v-btn color="brown" @click="addPoop">Add Poop!</v-btn>
+        <v-btn color="green" @click="addPoop">Add Poop!</v-btn>
       </v-col>
     </v-row>
+    <LoginModal />
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from "vue";
 import moment from "moment-timezone";
-import { dbPoopBank } from "../firebase";
+import { db } from "../firebase";
+import LoginModal from "./LoginModal.vue";
 // import moment-timezone from 'moment-timezone'
 // import New from '@/components/New.vue';
 
@@ -109,7 +116,9 @@ const now = moment();
 
 export default Vue.extend({
   name: "AddEntry",
-
+  components: {
+    LoginModal
+  },
   data: () => ({
     timestamp: now,
     showTimePicker: false,
@@ -214,7 +223,11 @@ export default Vue.extend({
       }
     ]
   }),
-  computed: {},
+  computed: {
+    username() {
+      return localStorage.getItem("poopAccount");
+    }
+  },
   methods: {
     test() {
       console.log("meow");
@@ -224,7 +237,7 @@ export default Vue.extend({
         .tz(`${this.date} ${this.time}`, "Australia/Perth")
         .format();
 
-      dbPoopBank
+      db.collection(this.username)
         .add({
           timestamp: timestamp,
           type: this.typeValue,

@@ -14,5 +14,5 @@ const firebaseConfig = {
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
 
-const db = firebase.firestore();
-export const dbPoopBank = db.collection("poopbank");
+export const db = firebase.firestore();
+// export const dbPoopBank = db.collection("poopbank");
