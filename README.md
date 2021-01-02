@@ -1,4 +1,6 @@
 # poop-diary
+A PWA poop-tracking diary. 
+Future iterations will include data visualisation and fun APIs :) 
 
 ## Project setup
 ```
