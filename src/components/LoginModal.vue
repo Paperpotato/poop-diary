@@ -38,6 +38,7 @@
 
 <script lang="ts">
 import Vue from "vue";
+// import { fbAuth } from '../firebase';
 
 export default Vue.extend({
   data: () => ({

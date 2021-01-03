@@ -6,11 +6,11 @@
         <v-btn color="green" @click="test">Print stuff</v-btn>
       </v-col>
     </v-row> -->
-    <v-row>
+    <!-- <v-row>
       <v-col>
         <v-btn color="green" @click="addPoop">Add Poop!</v-btn>
       </v-col>
-    </v-row>
+    </v-row> -->
     <v-row>
       <v-col>
         <v-btn color="brown" @click="showTimePicker = !showTimePicker"
@@ -34,6 +34,9 @@
           v-model="date"
           color="green lighten-1"
         ></v-date-picker>
+      </v-col>
+      <v-col>
+        <v-btn color="green" @click="addPoop">Add Poop!</v-btn>
       </v-col>
     </v-row>
     <v-row>
@@ -101,11 +104,20 @@
       </v-col>
     </v-row>
     <LoginModal />
+    <v-snackbar v-model="snackbarText" timeout="1000">
+      {{ snackbarText }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn color="blue" text v-bind="attrs" @click="showSnackbar = false">
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
 <script lang="ts">
-import Vue from "vue";
+// import Vue from "vue";
 import moment from "moment-timezone";
 import { db } from "../firebase";
 import LoginModal from "./LoginModal.vue";
@@ -114,12 +126,14 @@ import LoginModal from "./LoginModal.vue";
 
 const now = moment();
 
-export default Vue.extend({
+export default {
   name: "AddEntry",
   components: {
     LoginModal
   },
   data: () => ({
+    showSnackbar: false,
+    snackbarText: "Thanks for pooping! 💩💩💩",
     timestamp: now,
     showTimePicker: false,
     time: now.format("hh:mm"),
@@ -232,27 +246,33 @@ export default Vue.extend({
   created() {
     const username = localStorage.getItem("poopAccount");
     this.username = username ? username : "";
+    this.$store.state.username = username;
+    // console.log(this.username)
   },
   methods: {
     test() {
       console.log(localStorage.getItem("poopAccount"));
+      this.$router.push("/bank");
     },
     addPoop() {
       const timestamp = moment
         .tz(`${this.date} ${this.time}`, "Australia/Perth")
         .format();
+      this.showSnackbar = true;
 
-      db.collection(this.username)
-        .add({
+      const payload = {
+        username: this.username,
+        poop: {
           timestamp: timestamp,
           type: this.typeValue,
           notes: this.notes,
           foodNotes: this.foods,
           symptomNotes: this.symptoms,
           moods: this.moods
-        })
-        .then(() => console.log("Poop saved!"));
+        }
+      };
+      this.$store.dispatch("sendPoop", payload);
     }
   }
-});
+};
 </script>
