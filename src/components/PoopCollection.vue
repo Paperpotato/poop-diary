@@ -30,28 +30,44 @@ export default {
     ],
     rawBankData: [],
     dataByDate: [],
+    //apexchart data
     chartOptions: {
       chart: {
-        id: "vuechart-example"
+        id: "time-series"
       },
       xaxis: {
-        categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+        // categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
+        type: "category"
       }
     },
     series: [
       {
-        name: "series-1",
-        data: [30, 40, 35, 50, 49, 60, 70, 91]
+        // name: "test1",
+        data: []
       }
     ]
   }),
-  computed: {},
+  computed: {
+    // series() {
+    //   return [
+    //     {
+    //       name: "series-1",
+    //       data: [30, 40, 35, 50, 49, 60, 70, 100]
+    //     },
+    //     {
+    //       name: "series-2",
+    //       data: [30, 40, 35, 50, 49, 60, 70, 100]
+    //     }
+    //   ]
+    // }
+  },
   methods: {
     test() {
-      console.log(this.rawBankData);
-      this.rawBankData.forEach(poop => {
-        console.log(poop);
-      });
+      // console.log(this.rawBankData);
+      // this.rawBankData.forEach(poop => {
+      //   console.log(poop);
+      // });
+      console.log(this.series);
     }
   },
   created() {
@@ -66,16 +82,19 @@ export default {
 
           const poopDate = moment(docData.timestamp).format("DD-MMM");
           const poopUnix = moment(docData.timestamp).format("x");
-          const poopExists = output.find(poop => poop[0] === poopDate);
+          const poopExists = output.find(poop => poop.x === poopDate);
           if (!poopExists) {
-            output.push([poopDate, 1, poopUnix]);
+            output.push({
+              x: poopDate,
+              y: 1
+            });
           } else {
-            poopExists[1]++;
-            poopExists[2] = poopUnix;
+            poopExists.y++;
+            // poopExists[2] = poopUnix;
           }
         });
         output.sort();
-        this.rawBankData = output;
+        this.series[0].data = output;
       })
       .catch(function(error) {
         console.log("Error getting documents: ", error);
