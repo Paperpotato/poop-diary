@@ -8,6 +8,11 @@ import vuetify from "./plugins/vuetify";
 import Chartkick from "vue-chartkick";
 import Chart from "chart.js";
 
+import VueApexCharts from "vue-apexcharts";
+Vue.use(VueApexCharts);
+
+Vue.component("apexchart", VueApexCharts);
+
 Vue.use(Chartkick.use(Chart));
 
 // import VCharts from 'v-charts'

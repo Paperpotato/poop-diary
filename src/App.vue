@@ -8,9 +8,7 @@
           </div>
         </v-col>
         <!-- <v-btn @click='addPoop' color='green'>Add Poop!</v-btn> -->
-        <v-btn @click="this.$router.push('/bank')" color="green"
-          >Poop Bank</v-btn
-        >
+        <v-btn @click="$router.push('/bank')" color="green">Poop Bank</v-btn>
       </v-row>
     </v-app-bar>
 

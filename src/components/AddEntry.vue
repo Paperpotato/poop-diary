@@ -116,7 +116,7 @@
   </v-container>
 </template>
 
-<script lang="ts">
+<script>
 // import Vue from "vue";
 import moment from "moment-timezone";
 import { db } from "../firebase";
