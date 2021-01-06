@@ -5,10 +5,11 @@
       type="bar"
       :options="chartOptions"
       :series="series"
+      ref="demoChart"
     ></apexchart>
 
-    <column-chart :data="rawBankData"></column-chart>
-    <column-chart :data="barData"></column-chart>
+    <!-- <column-chart :data="rawBankData"></column-chart>
+    <column-chart :data="barData"></column-chart> -->
     <v-btn @click="test" color="green">Test</v-btn>
   </v-container>
 </template>
@@ -23,26 +24,25 @@ export default {
   //   apexchart
   // },
   data: () => ({
-    barData: [
-      ["Sun", 32, 10],
-      ["Mon", 46, 99],
-      ["Tue", 28, 50]
-    ],
+    // barData: [
+    //   ["Sun", 32, 10],
+    //   ["Mon", 46, 99],
+    //   ["Tue", 28, 50]
+    // ],
     rawBankData: [],
-    dataByDate: [],
+    // dataByDate: [],
     //apexchart data
     chartOptions: {
       chart: {
         id: "time-series"
       },
       xaxis: {
-        // categories: [1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998]
         type: "category"
       }
     },
     series: [
       {
-        // name: "test1",
+        // data: [{x: 'meow', y: 2}]
         data: []
       }
     ]
@@ -63,11 +63,11 @@ export default {
   },
   methods: {
     test() {
-      // console.log(this.rawBankData);
-      // this.rawBankData.forEach(poop => {
-      //   console.log(poop);
-      // });
-      console.log(this.series);
+      console.log("meow");
+      // this.series[0].data = {
+      //   x: 'cheese',
+      //   y: 20
+      // }
     }
   },
   created() {
@@ -76,25 +76,43 @@ export default {
       .get()
       .then(querySnapshot => {
         const output = [];
+        const test = [];
         querySnapshot.forEach(doc => {
           const docData = doc.data();
           this.rawBankData.push(docData);
 
-          const poopDate = moment(docData.timestamp).format("DD-MMM");
+          const poopDate = moment(docData.timestamp).format("DD/MM/YYYY");
           const poopUnix = moment(docData.timestamp).format("x");
-          const poopExists = output.find(poop => poop.x === poopDate);
-          if (!poopExists) {
+          const foundPoop = output.find(poop => poop.x === poopDate);
+
+          if (!foundPoop) {
             output.push({
               x: poopDate,
-              y: 1
+              y: 1,
+              z: poopUnix
             });
+            test.push(poopUnix);
           } else {
-            poopExists.y++;
+            foundPoop.y++;
             // poopExists[2] = poopUnix;
           }
         });
-        output.sort();
-        this.series[0].data = output;
+
+        test.sort();
+        console.log(test);
+        // output.sort(function(a, b) { return a.poopUnix > b.poopUnix ? 1 : -1})
+        output.sort((a, b) => a.poopUnix - b.poopUnix);
+        // output.sort()
+        console.log("sorted output", output);
+        this.series = [
+          {
+            data: output
+          }
+        ];
+        // this.series[0].data = output;
+        this.poopData = output;
+        console.log(this.series);
+        console.log(this.poopData);
       })
       .catch(function(error) {
         console.log("Error getting documents: ", error);
