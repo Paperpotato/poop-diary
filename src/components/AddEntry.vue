@@ -13,7 +13,7 @@
     </v-row> -->
     <v-row>
       <v-col>
-        <v-btn color="brown" @click="showTimePicker = !showTimePicker"
+        <v-btn small color="brown" @click="showTimePicker = !showTimePicker"
           >Edit Time</v-btn
         >
         <v-time-picker
@@ -26,7 +26,7 @@
         <h3>{{ timestamp.format("h:mma DD-MM-YY") }}</h3>
       </v-col>
       <v-col>
-        <v-btn color="brown" @click="showDatePicker = !showDatePicker"
+        <v-btn small color="brown" @click="showDatePicker = !showDatePicker"
           >Edit Date</v-btn
         >
         <v-date-picker
@@ -50,7 +50,6 @@
               min="1"
               max="7"
               thumb-label="always"
-              label="Poop type"
               :tick-labels="tickLabels"
             ></v-slider>
           </v-card-text>
