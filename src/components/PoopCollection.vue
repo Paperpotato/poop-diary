@@ -43,7 +43,7 @@ export default {
       dataLabels: {
         enabled: false
       },
-      colors: ["#008FFB"],
+      colors: ["#964B00"],
       title: {
         text: "PoopMap Chart (Single color)"
       }
@@ -53,14 +53,17 @@ export default {
         name: "Monday",
         data: [
           {
-            week: 0,
             x: "W1",
             y: 22,
             z: "1/1/1"
           },
           {
-            week: 1,
             x: "W2",
+            y: 29,
+            z: "1/1/1"
+          },
+          {
+            x: "W3",
             y: 29,
             z: "1/1/1"
           }
@@ -70,13 +73,11 @@ export default {
         name: "Tuesday",
         data: [
           {
-            week: 0,
             x: "W1",
             y: 43,
             z: "1/1/1"
           },
           {
-            week: 2,
             x: "W2",
             y: 43,
             z: "1/1/1"
@@ -90,9 +91,19 @@ export default {
       },
       xaxis: {
         type: "category"
-      }
+      },
+      colors: ["#964B00"]
     },
     donutOptions: {
+      colors: [
+        "#bc8f8f",
+        "#f4a460",
+        "#d2691e",
+        "#a0522d",
+        "#ffdead",
+        "#ffe4c4",
+        "#fff8e7"
+      ],
       plotOptions: {
         pie: {
           customScale: 0.8,
@@ -154,19 +165,39 @@ export default {
         const mapOutput = [
           {
             name: "Monday",
-            data: []
+            data: [
+              {
+                x: "Week 1",
+                y: 0
+              }
+            ]
           },
           {
             name: "Tuesday",
-            data: []
+            data: [
+              {
+                x: "Week 1",
+                y: 0
+              }
+            ]
           },
           {
             name: "Wednesday",
-            data: []
+            data: [
+              {
+                x: "Week 1",
+                y: 0
+              }
+            ]
           },
           {
             name: "Thursday",
-            data: []
+            data: [
+              {
+                x: "Week 1",
+                y: 0
+              }
+            ]
           },
           {
             name: "Friday",
@@ -181,6 +212,7 @@ export default {
             data: []
           }
         ];
+
         querySnapshot.forEach(doc => {
           const poop = doc.data();
           const poopTimeStamp = moment(poop.timestamp);
@@ -200,20 +232,18 @@ export default {
             day => day.name === poopTimeStamp.format("dddd")
           );
           const foundPoopWeek = foundMapPoop.data.find(
-            week => week.x === `W${poopWeek}`
+            week => week.x === `Week ${poopWeek}`
           );
-          console.log({ foundPoopWeek });
+
           if (!foundPoopWeek) {
             foundMapPoop.data.push({
-              x: `W${poopWeek}`,
+              x: `Week ${poopWeek}`,
               y: 1
+              // z: poopDate
             });
-            console.log(foundMapPoop);
           } else {
             foundPoopWeek.y++;
           }
-
-          this.mapSeries = mapOutput;
 
           if (!foundPoop) {
             output.push({
@@ -226,10 +256,17 @@ export default {
           }
         });
 
+        // mapOutput.find(day => day.name === 'Saturday').data.push({
+        //     x: `Week 5`,
+        //     y: 1
+        //   });
+        console.log({ mapOutput });
+        mapOutput.forEach(day => day.data.sort((a, b) => a.x < b.x));
+        this.mapSeries = mapOutput;
+
         this.donutSeries = pieOutput;
         output.sort((a, b) => parseInt(a.z) - parseInt(b.z));
         // output.sort()
-        console.log("sorted output", output);
         this.series = [
           {
             data: output
