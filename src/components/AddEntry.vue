@@ -86,7 +86,7 @@
         ></v-checkbox>
       </v-col>
     </v-row>
-    <h5>How're you actually feeling?</h5>
+    <h5>How's your brain?</h5>
     <v-row>
       <v-col v-for="mood in moods" :key="mood.label">
         <v-checkbox
@@ -144,11 +144,27 @@ export default {
     notes: "",
     foods: [
       {
+        label: "Vegetarian",
+        value: false
+      },
+      {
+        label: "High Meat",
+        value: false
+      },
+      {
         label: "Intermittent Fast",
         value: false
       },
       {
+        label: "Frequent Meals",
+        value: false
+      },
+      {
         label: "Low Quality",
+        value: false
+      },
+      {
+        label: "Clean Food",
         value: false
       },
       {
@@ -168,11 +184,15 @@ export default {
         value: false
       },
       {
-        label: "Gluten",
+        label: "High Gluten",
         value: false
       },
       {
-        label: "Dairy",
+        label: "Gluten-Free",
+        value: false
+      },
+      {
+        label: "High Dairy",
         value: false
       },
       {
@@ -187,6 +207,10 @@ export default {
     symptoms: [
       {
         label: "Stomach Ache",
+        value: false
+      },
+      {
+        label: "Indigestion",
         value: false
       },
       {
@@ -206,11 +230,7 @@ export default {
         value: false
       },
       {
-        label: "Slow",
-        value: false
-      },
-      {
-        label: "Fast",
+        label: "Bloody",
         value: false
       },
       {
@@ -234,20 +254,19 @@ export default {
       {
         label: "Sad",
         value: false
+      },
+      {
+        label: "Fatigued",
+        value: false
       }
     ],
     username: ""
   }),
-  computed: {
-    // username() {
-    //   return localStorage.getItem("poopAccount");
-    // }
-  },
+  computed: {},
   created() {
     const username = localStorage.getItem("poopAccount");
     this.username = username ? username : "";
     this.$store.state.username = username;
-    // console.log(this.username)
   },
   methods: {
     test() {

@@ -48,43 +48,7 @@ export default {
         text: "PoopMap Chart (Single color)"
       }
     },
-    mapSeries: [
-      {
-        name: "Monday",
-        data: [
-          {
-            x: "W1",
-            y: 22,
-            z: "1/1/1"
-          },
-          {
-            x: "W2",
-            y: 29,
-            z: "1/1/1"
-          },
-          {
-            x: "W3",
-            y: 29,
-            z: "1/1/1"
-          }
-        ]
-      },
-      {
-        name: "Tuesday",
-        data: [
-          {
-            x: "W1",
-            y: 43,
-            z: "1/1/1"
-          },
-          {
-            x: "W2",
-            y: 43,
-            z: "1/1/1"
-          }
-        ]
-      }
-    ],
+    mapSeries: [],
     chartOptions: {
       chart: {
         id: "time-series"
