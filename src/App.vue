@@ -8,7 +8,7 @@
           </div>
         </v-col>
         <!-- <v-btn @click='addPoop' color='green'>Add Poop!</v-btn> -->
-        <v-btn @click="$router.push('/bank')" color="green">Poop Bank</v-btn>
+        <v-btn @click="goToBank" color="green">Poop Bank</v-btn>
       </v-row>
     </v-app-bar>
 
@@ -25,6 +25,11 @@ export default Vue.extend({
   name: "App",
 
   data: () => ({}),
-  methods: {}
+  methods: {
+    goToBank() {
+      this.$store.dispatch("clearFilters");
+      this.$router.push("/bank");
+    }
+  }
 });
 </script>

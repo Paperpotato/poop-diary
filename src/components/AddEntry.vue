@@ -63,7 +63,7 @@
     </v-row>
     <h5>What did you eat?!</h5>
     <v-row>
-      <v-col v-for="food in foods" :key="food.label">
+      <v-col v-for="food in $store.state.filters.foods" :key="food.label">
         <v-checkbox
           v-model="food.value"
           :label="food.label"
@@ -75,7 +75,10 @@
     </v-row>
     <h5>Do you feel like shit?</h5>
     <v-row>
-      <v-col v-for="symptom in symptoms" :key="symptom.label">
+      <v-col
+        v-for="symptom in $store.state.filters.symptoms"
+        :key="symptom.label"
+      >
         <v-checkbox
           v-model="symptom.value"
           :label="symptom.label"
@@ -87,7 +90,7 @@
     </v-row>
     <h5>How's your brain?</h5>
     <v-row>
-      <v-col v-for="mood in moods" :key="mood.label">
+      <v-col v-for="mood in $store.state.filters.moods" :key="mood.label">
         <v-checkbox
           v-model="mood.value"
           :label="mood.label"
@@ -103,15 +106,16 @@
       </v-col>
     </v-row>
     <LoginModal />
-    <v-snackbar v-model="snackbarText" timeout="1000">
+    <!-- SNACKBAR NOTIFICATION -->
+    <v-snackbar v-model="showSnackbar" timeout="1000">
       {{ snackbarText }}
-
       <template v-slot:action="{ attrs }">
         <v-btn color="blue" text v-bind="attrs" @click="showSnackbar = false">
           Close
         </v-btn>
       </template>
     </v-snackbar>
+    <v-btn @click="test">Test</v-btn>
   </v-container>
 </template>
 
@@ -120,6 +124,7 @@
 import moment from "moment-timezone";
 import { db } from "../firebase";
 import LoginModal from "./LoginModal.vue";
+import { mapState } from "vuex";
 // import moment-timezone from 'moment-timezone'
 // import New from '@/components/New.vue';
 
@@ -141,127 +146,11 @@ export default {
     typeValue: 4,
     tickLabels: ["🐇", "🌽", "🍆", "🐍", "☁", "🍦", "🌊"],
     notes: "",
-    foods: [
-      {
-        label: "Vegetarian",
-        value: false
-      },
-      {
-        label: "High Meat",
-        value: false
-      },
-      {
-        label: "Intermittent Fast",
-        value: false
-      },
-      {
-        label: "Frequent Meals",
-        value: false
-      },
-      {
-        label: "Low Quality",
-        value: false
-      },
-      {
-        label: "Clean Food",
-        value: false
-      },
-      {
-        label: "Low FODMAP",
-        value: false
-      },
-      {
-        label: "High FODMAP",
-        value: false
-      },
-      {
-        label: "Low Volume",
-        value: false
-      },
-      {
-        label: "High Volume",
-        value: false
-      },
-      {
-        label: "High Gluten",
-        value: false
-      },
-      {
-        label: "Gluten-Free",
-        value: false
-      },
-      {
-        label: "High Dairy",
-        value: false
-      },
-      {
-        label: "Spicy Food",
-        value: false
-      },
-      {
-        label: "Known Intolerance",
-        value: false
-      }
-    ],
-    symptoms: [
-      {
-        label: "Stomach Ache",
-        value: false
-      },
-      {
-        label: "Indigestion",
-        value: false
-      },
-      {
-        label: "Bloated",
-        value: false
-      },
-      {
-        label: "Gassy",
-        value: false
-      },
-      {
-        label: "Pungent",
-        value: false
-      },
-      {
-        label: "Discoloured",
-        value: false
-      },
-      {
-        label: "Bloody",
-        value: false
-      },
-      {
-        label: "Painful",
-        value: false
-      },
-      {
-        label: "Spicy",
-        value: false
-      }
-    ],
-    moods: [
-      {
-        label: "Stressed",
-        value: false
-      },
-      {
-        label: "Anxious",
-        value: false
-      },
-      {
-        label: "Sad",
-        value: false
-      },
-      {
-        label: "Fatigued",
-        value: false
-      }
-    ],
     username: ""
   }),
-  computed: {},
+  computed: {
+    ...mapState(["filters"])
+  },
   created() {
     const username = localStorage.getItem("poopAccount");
     this.username = username ? username : "";
@@ -269,8 +158,10 @@ export default {
   },
   methods: {
     test() {
-      console.log(localStorage.getItem("poopAccount"));
-      this.$router.push("/bank");
+      this.$store.state.filters.foods.find(
+        food => food.label === "Vegetarian"
+      ).value = true;
+      console.log(this.filters);
     },
     addPoop() {
       const timestamp = moment
@@ -284,9 +175,9 @@ export default {
           timestamp: timestamp,
           type: this.typeValue,
           notes: this.notes,
-          foodNotes: this.foods,
-          symptomNotes: this.symptoms,
-          moods: this.moods
+          foodNotes: this.$store.state.filters.foods,
+          symptomNotes: this.$store.state.filters.symptoms,
+          moods: this.$store.state.filters.moods
         }
       };
       this.$store.dispatch("sendPoop", payload);
