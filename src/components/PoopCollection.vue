@@ -10,8 +10,15 @@
     <apexchart
       width="1000"
       type="bar"
-      :options="chartOptions"
-      :series="series"
+      :options="rawTypeOptions"
+      :series="rawTypeSeries"
+    ></apexchart>
+
+    <apexchart
+      width="1000"
+      type="bar"
+      :options="filteredOptions"
+      :series="filteredSeries"
     ></apexchart>
 
     <template>
@@ -98,6 +105,21 @@ export default {
   data: () => ({
     filterModal: true,
     rawBankData: [],
+    totalRawPoops: 0,
+    rawTypeOptions: {
+      chart: {
+        id: "raw-series"
+      },
+      xaxis: {
+        type: "category"
+      },
+      colors: ["#F44336"]
+    },
+    rawTypeSeries: [
+      {
+        data: []
+      }
+    ],
     filteredOptions: {
       chart: {
         id: "filtered-series"
@@ -109,67 +131,7 @@ export default {
     },
     filteredSeries: [
       {
-        name: "Type 1",
-        data: [
-          {
-            x: "Type 1",
-            y: 0
-          }
-        ]
-      },
-      {
-        name: "Type 2",
-        data: [
-          {
-            x: "Type 2",
-            y: 0
-          }
-        ]
-      },
-      {
-        name: "Type 3",
-        data: [
-          {
-            x: "Type 3",
-            y: 0
-          }
-        ]
-      },
-      {
-        name: "Type 4",
-        data: [
-          {
-            x: "Type 4",
-            y: 0
-          }
-        ]
-      },
-      {
-        name: "Type 5",
-        data: [
-          {
-            x: "Type 5",
-            y: 0
-          }
-        ]
-      },
-      {
-        name: "Type 6",
-        data: [
-          {
-            x: "Type 6",
-            y: 0
-          }
-        ]
-      },
-      {
-        name: "Type 7",
-        data: [
-          {
-            x: "Type 7",
-            y: 0
-          }
-        ]
+        data: []
       }
     ],
     mapOptions: {
@@ -287,7 +249,54 @@ export default {
           return filteredKeys.indexOf(noteLabel) > -1;
         });
       });
-      console.log(this.filteredData);
+      // console.log(this.filteredData);
+      const filteredOutput = [
+        {
+          x: "Type 1",
+          y: 0
+        },
+        {
+          x: "Type 2",
+          y: 0
+        },
+        {
+          x: "Type 3",
+          y: 0
+        },
+        {
+          x: "Type 4",
+          y: 0
+        },
+        {
+          x: "Type 5",
+          y: 0
+        },
+        {
+          x: "Type 6",
+          y: 0
+        },
+        {
+          x: "Type 7",
+          y: 0
+        }
+      ];
+      this.filteredData.forEach(poop => {
+        filteredOutput.find(type => type.x === `Type ${poop.type}`).y++;
+      });
+
+      const totalFilteredPoops = filteredOutput
+        .map(poop => poop.y)
+        .reduce((a, b) => a + b, 0);
+
+      filteredOutput.forEach(poop => {
+        poop.y = Math.floor((poop.y / totalFilteredPoops) * 100);
+      });
+
+      this.filteredSeries = [
+        {
+          data: filteredOutput
+        }
+      ];
     }
   },
   created() {
@@ -297,6 +306,36 @@ export default {
       .then(querySnapshot => {
         const output = [];
         const pieOutput = [0, 0, 0, 0, 0, 0, 0];
+        const rawTypeOutput = [
+          {
+            x: "Type 1",
+            y: 0
+          },
+          {
+            x: "Type 2",
+            y: 0
+          },
+          {
+            x: "Type 3",
+            y: 0
+          },
+          {
+            x: "Type 4",
+            y: 0
+          },
+          {
+            x: "Type 5",
+            y: 0
+          },
+          {
+            x: "Type 6",
+            y: 0
+          },
+          {
+            x: "Type 7",
+            y: 0
+          }
+        ];
         const mapOutput = [
           {
             name: "Monday",
@@ -347,11 +386,11 @@ export default {
             data: []
           }
         ];
+        this.totalRawPoops = querySnapshot.length;
         querySnapshot.forEach(doc => {
           const poop = doc.data();
           const poopTimeStamp = moment(poop.timestamp);
           this.rawBankData.push(poop);
-          // console.log(this.rawBankData)
 
           const poopDate = poopTimeStamp.format("DD/MM/YYYY");
           const poopUnix = poopTimeStamp.format("x");
@@ -390,6 +429,24 @@ export default {
             foundPoop.y++;
           }
         });
+
+        //POPULATES DATA FOR DEFAULT TYPES IN BAR FORMAT
+        this.rawBankData.forEach(poop => {
+          rawTypeOutput.find(type => type.x === `Type ${poop.type}`).y++;
+        });
+
+        const totalRawPoops = this.rawBankData.length;
+
+        rawTypeOutput.forEach(poop => {
+          console.log(poop.y);
+          poop.y = Math.floor((poop.y / totalRawPoops) * 100);
+        });
+
+        this.rawTypeSeries = [
+          {
+            data: rawTypeOutput
+          }
+        ];
 
         mapOutput.forEach(day => day.data.sort((a, b) => a.x < b.x));
         this.mapSeries = mapOutput;
