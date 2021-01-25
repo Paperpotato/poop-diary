@@ -1,5 +1,15 @@
 <template>
   <v-container>
+    <template>
+      <v-data-table
+        dense
+        :headers="poopTableHeaders"
+        :items="poopTableData"
+        item-key="name"
+        class="elevation-1"
+      ></v-data-table>
+    </template>
+
     <apexchart
       width="1000"
       type="heatmap"
@@ -90,8 +100,6 @@
       :series="donutSeries"
     ></apexchart>
 
-    <!-- <column-chart :data="rawBankData"></column-chart>
-    <column-chart :data="barData"></column-chart> -->
     <v-btn @click="test" color="green">Test</v-btn>
   </v-container>
 </template>
@@ -103,8 +111,39 @@ import Chart from "chart.js";
 
 export default {
   data: () => ({
-    filterModal: true,
+    filterModal: false,
     rawBankData: [],
+    poopTableData: [
+      {
+        label: "Gross Average",
+        average: 0,
+        total: 0,
+        "Type 1": 0,
+        "Type 2": 0,
+        "Type 3": 0,
+        "Type 4": 0,
+        "Type 5": 0,
+        "Type 6": 0,
+        "Type 7": 0
+      }
+    ],
+    poopTableHeaders: [
+      {
+        text: "Poop Notes",
+        align: "start",
+        sortable: false,
+        value: "label"
+      },
+      { text: "Average", value: "average" },
+      { text: "Total", value: "total" },
+      { text: "Type 1", value: "Type 1" },
+      { text: "Type 2", value: "Type 2" },
+      { text: "Type 3", value: "Type 3" },
+      { text: "Type 4", value: "Type 4" },
+      { text: "Type 5", value: "Type 5" },
+      { text: "Type 6", value: "Type 6" },
+      { text: "Type 7", value: "Type 7" }
+    ],
     totalRawPoops: 0,
     rawTypeOptions: {
       chart: {
@@ -218,6 +257,16 @@ export default {
     test() {
       console.log("meow");
     },
+    flattenNotes(poop) {
+      const notes = Object.values(poop.foodNotes).concat(
+        Object.values(poop.symptomNotes),
+        Object.values(poop.moods)
+      );
+
+      return Object.values(notes.filter(note => note.value)).map(
+        note => note.label
+      );
+    },
     createFilters() {
       console.log("populate filteredSeries with with filtered data");
       for (const type of this.filteredSeries) {
@@ -238,13 +287,7 @@ export default {
         .map(filter => filter.label);
 
       this.filteredData = this.rawBankData.filter(poop => {
-        const notes = Object.values(poop.foodNotes).concat(
-          Object.values(poop.symptomNotes),
-          Object.values(poop.moods)
-        );
-        const positiveNoteArray = Object.values(
-          notes.filter(note => note.value)
-        ).map(note => note.label);
+        const positiveNoteArray = this.flattenNotes(poop);
         return positiveNoteArray.some(noteLabel => {
           return filteredKeys.indexOf(noteLabel) > -1;
         });
@@ -387,6 +430,7 @@ export default {
           }
         ];
         this.totalRawPoops = querySnapshot.length;
+
         querySnapshot.forEach(doc => {
           const poop = doc.data();
           const poopTimeStamp = moment(poop.timestamp);
@@ -438,7 +482,6 @@ export default {
         const totalRawPoops = this.rawBankData.length;
 
         rawTypeOutput.forEach(poop => {
-          console.log(poop.y);
           poop.y = Math.floor((poop.y / totalRawPoops) * 100);
         });
 
@@ -448,6 +491,59 @@ export default {
           }
         ];
 
+        const notesList = []
+          .concat(...Object.values(this.$store.state.filters))
+          .map(filter => filter.label);
+        //INITIALISE TABLE
+        notesList.forEach(note => {
+          this.poopTableData.push({
+            label: note,
+            average: 0,
+            total: 0,
+            "Type 1": 0,
+            "Type 2": 0,
+            "Type 3": 0,
+            "Type 4": 0,
+            "Type 5": 0,
+            "Type 6": 0,
+            "Type 7": 0
+          });
+        });
+
+        //POPULATE POOPTABLE DATA
+
+        this.rawBankData.forEach(poop => {
+          console.log("meow");
+          const positiveNotes = this.flattenNotes(poop);
+
+          this.poopTableData.forEach(tableEntry => {
+            if (positiveNotes.includes(tableEntry.label)) {
+              tableEntry[`Type ${poop.type}`]++;
+              tableEntry.total++;
+            }
+            this.poopTableData[0][`Type ${poop.type}`]++;
+            this.poopTableData[0].total++;
+          });
+        });
+
+        this.poopTableData.forEach(tableEntry => {
+          const type2 = tableEntry["Type 2"] * 2;
+          const typeArray = Object.keys(tableEntry).filter(key =>
+            key.match(/\d/)
+          );
+          console.log(tableEntry.label);
+          let grossType = 0;
+          for (let i = 0; i < typeArray.length; i++) {
+            console.log(tableEntry[typeArray[i]]);
+            grossType += tableEntry[typeArray[i]] * (i + 1);
+          }
+
+          tableEntry.average = grossType
+            ? (grossType / tableEntry.total).toFixed(1)
+            : "No Data";
+        });
+
+        //POPULATE HEATMAP DATA
         mapOutput.forEach(day => day.data.sort((a, b) => a.x < b.x));
         this.mapSeries = mapOutput;
 
