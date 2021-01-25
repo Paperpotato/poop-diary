@@ -521,9 +521,14 @@ export default {
               tableEntry[`Type ${poop.type}`]++;
               tableEntry.total++;
             }
-            this.poopTableData[0][`Type ${poop.type}`]++;
-            this.poopTableData[0].total++;
+            // this.poopTableData[0][`Type ${poop.type}`]++;
+            // this.poopTableData[0].total++;
           });
+        });
+
+        this.rawBankData.forEach(poop => {
+          this.poopTableData[0][`Type ${poop.type}`]++;
+          this.poopTableData[0].total++;
         });
 
         this.poopTableData.forEach(tableEntry => {
