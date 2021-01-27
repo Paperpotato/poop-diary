@@ -113,6 +113,15 @@ export default {
   data: () => ({
     filterModal: false,
     rawBankData: [],
+    typeLabels: [
+      "Type 1",
+      "Type 2",
+      "Type 3",
+      "Type 4",
+      "Type 5",
+      "Type 6",
+      "Type 7"
+    ],
     poopTableData: [
       {
         label: "Gross Average",
@@ -174,12 +183,17 @@ export default {
       }
     ],
     mapOptions: {
+      plotOptions: {
+        heatmap: {
+          radius: 5,
+          height: 100
+        }
+      },
       chart: {
-        height: 350,
         type: "heatmap"
       },
       dataLabels: {
-        enabled: false
+        enabled: true
       },
       colors: ["#964B00"],
       title: {
@@ -237,12 +251,6 @@ export default {
         "Type 6",
         "Type 7"
       ]
-      // total: {
-      //     show: true,
-      //     showAlways: true,
-      //     label: 'Total',
-      //     fontSize: '32px',
-      // }
     },
     series: [
       {
@@ -292,37 +300,15 @@ export default {
           return filteredKeys.indexOf(noteLabel) > -1;
         });
       });
-      // console.log(this.filteredData);
-      const filteredOutput = [
-        {
-          x: "Type 1",
+
+      //INITIALISE OUTPUT
+      const filteredOutput = this.typeLabels.map(type => {
+        return {
+          x: type,
           y: 0
-        },
-        {
-          x: "Type 2",
-          y: 0
-        },
-        {
-          x: "Type 3",
-          y: 0
-        },
-        {
-          x: "Type 4",
-          y: 0
-        },
-        {
-          x: "Type 5",
-          y: 0
-        },
-        {
-          x: "Type 6",
-          y: 0
-        },
-        {
-          x: "Type 7",
-          y: 0
-        }
-      ];
+        };
+      });
+
       this.filteredData.forEach(poop => {
         filteredOutput.find(type => type.x === `Type ${poop.type}`).y++;
       });
@@ -347,88 +333,37 @@ export default {
     db.collection(username)
       .get()
       .then(querySnapshot => {
+        //INITIALISE OUTPUTS
         const output = [];
         const pieOutput = [0, 0, 0, 0, 0, 0, 0];
-        const rawTypeOutput = [
-          {
-            x: "Type 1",
+        const rawTypeOutput = this.typeLabels.map(type => {
+          return {
+            x: type,
             y: 0
-          },
-          {
-            x: "Type 2",
-            y: 0
-          },
-          {
-            x: "Type 3",
-            y: 0
-          },
-          {
-            x: "Type 4",
-            y: 0
-          },
-          {
-            x: "Type 5",
-            y: 0
-          },
-          {
-            x: "Type 6",
-            y: 0
-          },
-          {
-            x: "Type 7",
-            y: 0
-          }
-        ];
+          };
+        });
         const mapOutput = [
-          {
-            name: "Monday",
-            data: [
-              {
-                x: "Week 1",
-                y: 0
-              }
-            ]
-          },
-          {
-            name: "Tuesday",
-            data: [
-              {
-                x: "Week 1",
-                y: 0
-              }
-            ]
-          },
-          {
-            name: "Wednesday",
-            data: [
-              {
-                x: "Week 1",
-                y: 0
-              }
-            ]
-          },
-          {
-            name: "Thursday",
-            data: [
-              {
-                x: "Week 1",
-                y: 0
-              }
-            ]
-          },
-          {
-            name: "Friday",
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ].map(day => {
+          const dayObject = {
+            name: day,
             data: []
-          },
-          {
-            name: "Saturday",
-            data: []
-          },
-          {
-            name: "Sunday",
-            data: []
+          };
+          for (let i = 1; i < 53; i++) {
+            dayObject.data.push({
+              x: `W${i}`,
+              y: 0
+            });
           }
-        ];
+          return dayObject;
+        });
+
         this.totalRawPoops = querySnapshot.length;
 
         querySnapshot.forEach(doc => {
@@ -437,7 +372,7 @@ export default {
           this.rawBankData.push(poop);
 
           const poopDate = poopTimeStamp.format("DD/MM/YYYY");
-          const poopUnix = poopTimeStamp.format("x");
+          // const poopUnix = poopTimeStamp.format("x");
           const foundPoop = output.find(poop => poop.x === poopDate);
           const poopType = poop.type - 1;
 
@@ -450,14 +385,13 @@ export default {
             day => day.name === poopTimeStamp.format("dddd")
           );
           const foundPoopWeek = foundMapPoop.data.find(
-            week => week.x === `Week ${poopWeek}`
+            week => week.x === `W${poopWeek}`
           );
 
           if (!foundPoopWeek) {
             foundMapPoop.data.push({
-              x: `Week ${poopWeek}`,
+              x: `W${poopWeek}`,
               y: 1
-              // z: poopDate
             });
           } else {
             foundPoopWeek.y++;
@@ -466,8 +400,7 @@ export default {
           if (!foundPoop) {
             output.push({
               x: poopDate,
-              y: 1,
-              z: poopUnix
+              y: 1
             });
           } else {
             foundPoop.y++;
@@ -511,18 +444,18 @@ export default {
         });
 
         //POPULATE POOPTABLE DATA
-
         this.rawBankData.forEach(poop => {
           console.log("meow");
           const positiveNotes = this.flattenNotes(poop);
+          const apportionedPositiveNote = parseFloat(
+            (1 / positiveNotes.length).toPrecision(3)
+          );
 
           this.poopTableData.forEach(tableEntry => {
             if (positiveNotes.includes(tableEntry.label)) {
-              tableEntry[`Type ${poop.type}`]++;
-              tableEntry.total++;
+              tableEntry[`Type ${poop.type}`] += apportionedPositiveNote;
+              tableEntry.total += apportionedPositiveNote;
             }
-            // this.poopTableData[0][`Type ${poop.type}`]++;
-            // this.poopTableData[0].total++;
           });
         });
 
